@@ -59,6 +59,17 @@ module.exports = class Comment extends PlayerUIComponent {
     return new Comment(data, plugin.player);
   }
 
+  // Return a Comment obj given body content and plugin reference
+  static newExtFromData(body, commentList, plugin) {
+    const data = {
+      meta: body.meta,
+      id: body.id,
+      body: body.body
+    };
+    data.commentList = commentList;
+    return new Comment(data, plugin.player);
+  }
+
   // Return an object with plugin data, timestamp, unique id, and body content
   static dataObj(body, plugin) {
     return {

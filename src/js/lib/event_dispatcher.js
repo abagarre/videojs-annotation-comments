@@ -26,12 +26,19 @@ const EventRegistry = {
     newAnnotation: (event, _this) => {
       _this.createAndAddAnnotation(event.detail);
     },
+    newExtAnnotation: function newExtAnnotation(event, _this) {
+      _this.createAndAddExtAnnotation(event.detail);
+    },
     destroyAnnotation: (event, _this) => {
       _this.destroyAnnotationById(event.detail.id);
     },
     newComment: (event, _this) => {
       const annotation = _this.findAnnotation(event.detail.annotationId);
       if (annotation) annotation.commentList.createComment(event.detail.body);
+    },
+    newExtComment: function newExtComment(event, _this) {
+      const annotation = _this.findAnnotation(event.detail.annotationId);
+      if (annotation) annotation.commentList.createExtComment(event.detail.body);
     },
     destroyComment: (event, _this) => {
       const comment = _this.findComment(event.detail.id);

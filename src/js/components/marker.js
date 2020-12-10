@@ -39,6 +39,7 @@ module.exports = class Marker extends PlayerUIComponent {
     // Bind to local instance var, add to DOM, and setup events
     this.$el = $(this.renderTemplate(this.templateName, this.markerTemplateData));
     this.$UI.markerWrap.append(this.$el);
+    if(this.comment) this.$el.addClass(this.comment.meta.user_name);
     this.bindMarkerEvents();
   }
 

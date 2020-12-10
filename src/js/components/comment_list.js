@@ -113,11 +113,23 @@ module.exports = class CommentList extends PlayerUIComponent {
 
     // Don't mutate UI if comment is being created for an inactive annotation (via API)
     if (this.annotation.isActive) {
-      this.reRender(false);
+      // this.reRender(false);
       this.closeNewComment();
     }
 
-    this.plugin.annotationState.stateChanged();
+    this.plugin.annotationState.stateChanged(this.annotation.id);
+  }
+
+  createExtComment(body) {
+    const comment = Comment.newExtFromData(body, this, this.plugin);
+    this.comments.push(comment);
+    this.sortComments();
+
+    // Don't mutate UI if comment is being created for an inactive annotation (via API)
+    if (this.annotation.isActive) {
+      // this.reRender(false);
+      this.closeNewComment();
+    }
   }
 
   // Cancel comment adding process

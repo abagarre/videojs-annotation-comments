@@ -8,6 +8,9 @@
   "files": [
     "build"
   ],
+  "engines": {
+    "node": "11.14.0"
+  },
   "scripts": {
     "test": "gulp test",
     "integration": "echo open in chrome: http://localhost:3004/mocha/features/index.html",

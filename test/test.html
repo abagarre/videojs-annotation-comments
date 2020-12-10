@@ -99,7 +99,7 @@
               meta: {
                 datetime: "2017-03-28T19:21:41.351Z",
                 user_id: 1,
-                user_name: "Jack Pope"
+                user_name: "Louis"
               },
               body:
                 "Can we have a music change for this final section that transitions towards the final frame? Some sweet heavy rock 80s ballad?"
@@ -130,9 +130,7 @@
   </head>
   <body>
     <div id="video_wrap">
-      <div>
-        <button onclick="ADD()" style="margin-top:20px">+ ADD VIDEO</button>
-      </div>
+
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -151,9 +149,9 @@
             user_name: "John Smith"
           },
           showControls: true,
-          showCommentList: true,
+          showCommentList: false,
           showFullScreen: true,
-          startInAnnotationMode: false,
+          startInAnnotationMode: true,
           showMarkerShapeAndTooltips: true
         };
 
@@ -167,11 +165,7 @@
           '" class="video-js" controls preload="auto" width="720" height="405" data-setup="{}">';
         html +=
           '<source src="contently-platform-overview.mp4" type="video/mp4"></video>';
-        html +=
-          '<div><button onclick="REMOVE(' +
-          id +
-          ')">- REMOVE VIDEO</button></div>';
-        html += "</div>";
+        html += '<hr style="bottom: 0">';
 
         var $lastVid = $(".vwrap:last");
         if ($lastVid.length) {
@@ -214,3 +208,19 @@
     </script>
   </body>
 </html>
+
+<style>
+
+  .Jack {
+      bottom: -75px!important;
+  }
+
+  .Evan {
+      bottom: -125px!important;
+  }
+
+  .Louis {
+      bottom: -175px!important;
+  }
+
+</style>

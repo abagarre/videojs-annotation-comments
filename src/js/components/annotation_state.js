@@ -70,7 +70,14 @@ module.exports = class AnnotationState extends PlayerComponent {
   addNewAnnotation(annotation) {
     this._annotations.push(annotation);
     this.openAnnotation(annotation, true, true, false, true);
-    this.stateChanged();
+    this.stateChanged(annotation.id);
+    this.setLiveAnnotation();
+  }
+
+  // Add a new ext annotation
+  addNewExtAnnotation(annotation) {
+    this._annotations.push(annotation);
+    this.rebuildAnnotationTimeMap();
   }
 
   // Create and add a annotation
@@ -82,9 +89,22 @@ module.exports = class AnnotationState extends PlayerComponent {
       data.shape,
       data.commentStr || '',
       this.plugin,
-      data.id
+      data.id || Utils.guid()
     );
     this.addNewAnnotation(annotation);
+  }
+
+  // Create and add ext annotation
+  createAndAddExtAnnotation(data) {
+    this.plugin.controls.uiState.adding && this.plugin.controls.cancelAddNew();
+
+    const annotation = Annotation.newFromExtData(
+      data.range,
+      data.shape,
+      data.comments,
+      this.plugin,
+      data.id);
+    this.addNewExtAnnotation(annotation);
   }
 
   // Destroy an existing annotation
@@ -113,8 +133,38 @@ module.exports = class AnnotationState extends PlayerComponent {
     }
 
     const matches = this.activeAnnotationsForTime(time);
-    if (!matches.length) return this.activeAnnotation.close();
+    // if (!matches.length) return this.activeAnnotation.close();
 
+    if (!matches.length) {
+      this.annotations.forEach((ann) => {ann.close()});
+      this.activeAnnotationList = [];
+      return;
+    }
+
+    // close all annotations that just became inactive
+    // update activeAnnotationList
+    const _activeAnnotationList = [];
+    this.activeAnnotationList.forEach((ann) => {
+      if(ann.secondsActive.includes(time)) {
+        _activeAnnotationList.push(ann);
+      } else {
+        ann.close();
+      }
+    });
+    this.activeAnnotationList = _activeAnnotationList;
+
+    const _this = this;
+    // Open annotations that just became active
+    matches.forEach((match) => {
+      if(!_this.annotations[match].isOpen) {
+        _this.openAnnotation(_this.annotations[match], false, false, true);
+        if(!_this.activeAnnotationList.includes(_this.annotations[match])) {
+          _this.activeAnnotationList.push(_this.annotations[match]);
+        }
+      }
+    })
+
+    /*
     // Set live annotation as the last match
     const liveAnnotation = this.annotations[matches[matches.length - 1]];
 
@@ -130,6 +180,7 @@ module.exports = class AnnotationState extends PlayerComponent {
     }
 
     this.openAnnotation(liveAnnotation, false, false, true);
+     */
   }
 
   // Get all active annotations for a time (in seconds)
@@ -157,7 +208,8 @@ module.exports = class AnnotationState extends PlayerComponent {
 
   // Close active annotation and remove reference in state
   clearActive() {
-    this.activeAnnotation.close(false);
+    // this.activeAnnotation.close(false);
+    this.activeAnnotationList.forEach(ann => ann.close());
     this._activeAnnotation = null;
   }
 
@@ -172,16 +224,16 @@ module.exports = class AnnotationState extends PlayerComponent {
   ) {
     if (!this.plugin.active) this.plugin.toggleAnnotationMode();
     this.skipLiveCheck = skipLiveCheck;
-    this.clearActive();
+    // this.clearActive();
     annotation.open(pause, previewOnly, forceSnapToStart);
-    this.activeAnnotation = annotation;
-    this.lastVideoTime = this.activeAnnotation.range.start;
+    // this.activeAnnotation = annotation;
+    this.lastVideoTime = annotation.range.start;
   }
 
   // Open an annotation by ID (if it exists)
   openAnnotationById(id) {
     const annotation = this.findAnnotation(id);
-    if (annotation) this.openAnnotation(annotation);
+    if (annotation) this.openAnnotation(annotation, true, false, false);
   }
 
   // Returns annotation object given ID
@@ -228,10 +280,17 @@ module.exports = class AnnotationState extends PlayerComponent {
 
   // Use anywhere the annotation data changes
   // Cleans internal state data, updates player button, triggers configurable callback
-  stateChanged() {
+  stateChanged(id = null) {
     this.sortAnnotations();
     this.rebuildAnnotationTimeMap();
-    this.plugin.fire('onStateChanged', this.data);
+    if(id != null) {
+      const data = {};
+      data.data = this.data;
+      data.id = id;
+      this.plugin.fire('onStateChanged', data);
+    } else {
+      this.plugin.fire('onStateChanged', this.data);
+    }
   }
 
   // Reset internal state properties
@@ -239,6 +298,7 @@ module.exports = class AnnotationState extends PlayerComponent {
     this.annotations = [];
     this.annotationTimeMap = {};
     this.activeAnnotation = null;
+    this.activeAnnotationList = [];
     this.enabled = false;
     this.skipNextTimeCheck = false;
     this.lastVideoTime = 0;

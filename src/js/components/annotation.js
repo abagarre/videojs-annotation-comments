@@ -63,7 +63,7 @@ module.exports = class Annotation extends PlayerUIComponent {
     const showTooltip = previewOnly && this.plugin.options.showMarkerShapeAndTooltips;
     this.marker.setActive(showTooltip);
     if (!previewOnly && this.plugin.options.showCommentList) {
-      this.commentList.render();
+      // this.commentList.render();
     }
 
     if (!previewOnly || (previewOnly && this.plugin.options.showMarkerShapeAndTooltips)) {
@@ -102,13 +102,13 @@ module.exports = class Annotation extends PlayerUIComponent {
   buildSecondsActiveArray() {
     const seconds = [];
     if (this.range.end) {
-      for (let i = this.range.start; i <= this.range.end; i++) {
+      for (let i = this.range.start; i < this.range.end; i++) {
         seconds.push(i);
       }
     } else {
       const { start } = this.range;
       seconds.push(start);
-      if (start < this.duration) seconds.push(start + 1);
+      // if (start < this.duration) seconds.push(start + 1);
     }
     return seconds;
   }
@@ -137,7 +137,20 @@ module.exports = class Annotation extends PlayerUIComponent {
     return new Annotation(data, plugin.player);
   }
 
+  // Build a new annotation instance from other user
+  static newFromExtData(range, shape, comments, plugin, id) {
+    if (range) range = Utils.parseIntObj(range);
+    if (shape) shape = Utils.parseIntObj(shape);
+    const data = {
+      id: id,
+      range: range,
+      shape: shape,
+      comments: comments
+    };
+    return new Annotation(data, plugin.player);
+  }
+
   get isActive() {
-    return this.plugin.annotationState.activeAnnotation === this;
+    return this.plugin.annotationState.activeAnnotationList.includes(this);
   }
 };
