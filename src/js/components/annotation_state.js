@@ -40,13 +40,21 @@ module.exports = class AnnotationState extends PlayerComponent {
     return this._annotations;
   }
 
-  set activeAnnotation(annotation = null) {
+  set activeAnnotation(annotation) {
     this._activeAnnotation = annotation;
   }
 
   // Get current active annotation or a null object with .close()
   get activeAnnotation() {
     return this._activeAnnotation || { close: () => {} };
+  }
+
+  set activeAnnotationList(annotationList) {
+    this._activeAnnotationList = annotationList;
+  }
+
+  get activeAnnotationList() {
+    return this._activeAnnotationList || [];
   }
 
   // Serialize data
@@ -113,13 +121,23 @@ module.exports = class AnnotationState extends PlayerComponent {
     if (annotation) annotation.teardown();
   }
 
+  // Destroy an existing annotation of another user
+  destroyExtAnnotationById(id) {
+    const annotation = this.findAnnotation(id);
+    if (annotation) annotation.teardown(true, false);
+  }
+
   // Remove an annotation
-  removeAnnotation(annotation) {
+  removeAnnotation(annotation, fireEvent = true) {
     const { id } = annotation;
     const i = this._annotations.indexOf(annotation);
     this._annotations.splice(i, 1);
-    this.stateChanged();
-    this.plugin.fire('annotationDeleted', { id });
+    if(fireEvent) {
+      // this.stateChanged();
+      this.plugin.fire('annotationDeleted', { id });
+    }
+    this.sortAnnotations();
+    this.rebuildAnnotationTimeMap();
   }
 
   // Set the live annotation based on current video time
@@ -151,7 +169,7 @@ module.exports = class AnnotationState extends PlayerComponent {
         ann.close();
       }
     });
-    this.activeAnnotationList = _activeAnnotationList;
+    this.activeAnnotationList = [..._activeAnnotationList];
 
     const _this = this;
     // Open annotations that just became active

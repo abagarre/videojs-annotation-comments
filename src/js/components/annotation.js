@@ -114,11 +114,11 @@ module.exports = class Annotation extends PlayerUIComponent {
   }
 
   // Tearsdown annotation and marker, removes object from AnnotationState
-  teardown(removeFromCollection = true) {
+  teardown(removeFromCollection = true, fireEvent = true) {
     this.close(true);
     this.marker.teardown();
     if (this.commentList) this.commentList.teardown(removeFromCollection);
-    if (removeFromCollection) this.plugin.annotationState.removeAnnotation(this);
+    if (removeFromCollection) this.plugin.annotationState.removeAnnotation(this, fireEvent);
     if (this.annotationShape) this.annotationShape.teardown();
     if (removeFromCollection) super.teardown();
   }

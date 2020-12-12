@@ -32,6 +32,9 @@ const EventRegistry = {
     destroyAnnotation: (event, _this) => {
       _this.destroyAnnotationById(event.detail.id);
     },
+    destroyExtAnnotation: (event, _this) => {
+      _this.destroyExtAnnotationById(event.detail.id);
+    },
     newComment: (event, _this) => {
       const annotation = _this.findAnnotation(event.detail.annotationId);
       if (annotation) annotation.commentList.createComment(event.detail.body);
