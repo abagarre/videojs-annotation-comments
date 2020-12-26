@@ -5,9 +5,11 @@
 const PlayerUIComponent = require('./../lib/player_ui_component');
 
 module.exports = class Shape extends PlayerUIComponent {
-  constructor(player, shape = null) {
+  constructor(player, shape = null, annId = 0, comment = null) {
     super(player);
     this.shape = shape;
+    this.annotationId = annId;
+    this.comment = comment;
     this.$parent = this.$player;
   }
 
@@ -17,6 +19,8 @@ module.exports = class Shape extends PlayerUIComponent {
     if (this.$el) this.$el.remove();
 
     this.$el = $('<div/>').addClass('vac-shape');
+    this.$el.addClass(`${this.annotationId}-shape`);
+    if(this.comment) this.$el.addClass(`${this.comment.meta.user_name}-shape`);
     this.setDimsFromShape();
     this.$parent.append(this.$el);
   }

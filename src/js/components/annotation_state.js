@@ -153,7 +153,7 @@ module.exports = class AnnotationState extends PlayerComponent {
     const matches = this.activeAnnotationsForTime(time);
     // if (!matches.length) return this.activeAnnotation.close();
 
-    if (!matches.length) {
+    if (!matches.length && this.annotations) {
       this.annotations.forEach((ann) => {ann.close()});
       this.activeAnnotationList = [];
       return;

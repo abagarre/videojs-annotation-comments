@@ -34,7 +34,7 @@ module.exports = class Annotation extends PlayerUIComponent {
   }
 
   buildShape() {
-    this.annotationShape = new Shape(this.player, this.shape);
+    this.annotationShape = new Shape(this.player, this.shape, this.id, this.commentList.comments[0]);
   }
 
   // Serialize object
