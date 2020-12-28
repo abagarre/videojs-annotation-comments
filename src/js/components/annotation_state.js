@@ -77,14 +77,17 @@ module.exports = class AnnotationState extends PlayerComponent {
   // Add a new annotation
   addNewAnnotation(annotation) {
     this._annotations.push(annotation);
-    this.openAnnotation(annotation, true, true, false, true);
+    // this.openAnnotation(annotation, false, true, false, true);
     this.stateChanged(annotation.id);
+    this.player.currentTime(annotation.range.start);
+    this.skipLiveCheck = false;
     this.setLiveAnnotation();
   }
 
   // Add a new ext annotation
   addNewExtAnnotation(annotation) {
     this._annotations.push(annotation);
+    this.sortAnnotations();
     this.rebuildAnnotationTimeMap();
   }
 
@@ -153,8 +156,8 @@ module.exports = class AnnotationState extends PlayerComponent {
     const matches = this.activeAnnotationsForTime(time);
     // if (!matches.length) return this.activeAnnotation.close();
 
-    if (!matches.length && this.annotations) {
-      this.annotations.forEach((ann) => {ann.close()});
+    if (!matches.length) {
+      if(this.annotations) this.annotations.forEach((ann) => {ann.close()});
       this.activeAnnotationList = [];
       return;
     }
@@ -228,6 +231,7 @@ module.exports = class AnnotationState extends PlayerComponent {
   clearActive() {
     // this.activeAnnotation.close(false);
     this.activeAnnotationList.forEach(ann => ann.close());
+    this.activeAnnotationList = [];
     this._activeAnnotation = null;
   }
 

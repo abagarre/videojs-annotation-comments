@@ -49,7 +49,7 @@ module.exports = class Annotation extends PlayerUIComponent {
 
   bindEvents() {
     this.marker.$el.on('click.vac-marker', e =>
-      this.plugin.annotationState.openAnnotation(this, true)
+      this.plugin.annotationState.openAnnotation(this, false)
     );
   }
 
